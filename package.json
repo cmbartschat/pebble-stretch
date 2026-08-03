@@ -1,0 +1,44 @@
+{
+    "author": "Christoph Bartschat",
+    "dependencies": {
+        "base-x": "^5.0.1",
+        "pebble-clay": "^1.0.0"
+    },
+    "keywords": [
+        "pebble-app"
+    ],
+    "name": "stretch",
+    "prettier": {
+        "singleQuote": true,
+        "semi": false,
+        "bracketSpacing": false,
+        "trailingComma": "es5"
+    },
+    "pebble": {
+        "capabilities": [
+            "configurable"
+        ],
+        "displayName": "Stretch",
+        "enableMultiJS": true,
+        "messageKeys": [
+            "BACKGROUND_COLOR",
+            "COLOR_0",
+            "COLOR_1",
+            "COLOR_2",
+            "COLOR_3"
+        ],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "emery"
+        ],
+        "uuid": "712f4a44-4112-460e-b266-f91e439fb3e0",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.0.3"
+}

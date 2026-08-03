@@ -1,0 +1,20 @@
+[package]
+name = "stretch"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["staticlib"]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+pebble_rust_2026 = { git = "https://github.com/cmbartschat/pebble-rust-2026.git", rev = "44f2cd392e7cc3030673b9d90a4d627b50530b21" }
+
+[profile.release]
+panic = "abort"
+opt-level = 2
+
+[profile.dev]
+panic = "abort"
