@@ -1,31 +1,24 @@
-use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, Time, color, log_fmt, resource_ids};
+use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, LocalTime, color, resource_ids};
 
 use crate::digits::{DigitBounds, render_digit};
 
 resource_ids!(resource_ids);
 
-pub fn render_time(ctx: &mut GContext, bounds: GRect) {
+#[derive(Clone)]
+pub struct DigitLayout {
+    first: DigitBounds,
+    stroke_width: u8,
+    offset: i16,
+}
+
+pub fn derive_layout(bounds: GRect) -> DigitLayout {
     let available = bounds.size.w.min(bounds.size.h);
     let base_scale = available.div_euclid(50);
 
     const STROKE_COUNT: i16 = 12;
     const SPACE_COUNT: i16 = 11;
-    let space_width: i16 = base_scale * 2;
+    let space_width: i16 = base_scale * 4;
     let stroke_width = (available - (space_width * STROKE_COUNT)) / SPACE_COUNT;
-
-    unsafe {
-        log_fmt!(
-            c"stroke_width: %i, space_width: %i, base_scale: %i",
-            stroke_width as i32,
-            space_width as i32,
-            base_scale as i32
-        );
-    }
-
-    ctx.set_stroke_width(stroke_width as u8);
-    ctx.set_stroke_color(color::GCOLOR_WHITE);
-
-    // let total_height = (stroke_width as i16) * STROKE_COUNT + space_width * SPACE_COUNT;
 
     let scale: i16 = space_width + stroke_width;
     let visible_bounds = GRect::new(0, 0, 11 * scale, 11 * scale).align(&bounds, GAlign::Center);
@@ -33,46 +26,68 @@ pub fn render_time(ctx: &mut GContext, bounds: GRect) {
     let base_y = visible_bounds.origin.y;
     let base_x = visible_bounds.origin.x;
 
-    let time = Time::now().to_local();
-    let hour = (time.hour() - 1) % 12 + 1;
-    let digit_0 = hour.div_euclid(10);
-    let digit_1 = hour.rem_euclid(10);
-    let digit_2 = time.minute().div_euclid(10);
-    let digit_3 = time.minute().rem_euclid(10);
-
-    render_digit(
-        digit_0,
-        ctx,
-        &DigitBounds {
+    DigitLayout {
+        first: DigitBounds {
             base: GPoint::new(base_x, base_y),
             scale,
         },
-    );
+        offset: 3 * scale,
+        stroke_width: stroke_width as u8,
+    }
+}
 
-    render_digit(
-        digit_1,
-        ctx,
-        &DigitBounds {
-            base: GPoint::new(base_x, base_y + 3 * scale),
-            scale,
-        },
-    );
+fn get_digits(time: &LocalTime) -> (i32, i32, i32, i32) {
+    let mut hour = time.hour();
+    if hour == 0 {
+        hour = 12;
+    } else if hour > 12 {
+        hour -= 12;
+    }
 
-    render_digit(
-        digit_2,
-        ctx,
-        &DigitBounds {
-            base: GPoint::new(base_x, base_y + 6 * scale),
-            scale,
-        },
-    );
+    (
+        hour.div_euclid(10),
+        hour.rem_euclid(10),
+        time.minute().div_euclid(10),
+        time.minute().rem_euclid(10),
+    )
+}
 
-    render_digit(
-        digit_3,
-        ctx,
-        &DigitBounds {
-            base: GPoint::new(base_x, base_y + 9 * scale),
-            scale,
-        },
-    );
+pub struct TimeInterpolation {
+    pub(crate) progress: i32,
+    pub(crate) from: LocalTime,
+    pub(crate) to: LocalTime,
+}
+
+pub fn render_interpolated_digit(
+    ctx: &mut GContext,
+    bounds: &DigitBounds,
+    old: i32,
+    new: i32,
+    progress: i32,
+) {
+    if old == new {
+        render_digit(new, ctx, bounds, 100);
+    } else if progress < 0 {
+        render_digit(old, ctx, bounds, -progress);
+    } else {
+        render_digit(new, ctx, bounds, progress);
+    }
+}
+
+pub fn render_animated_time(ctx: &mut GContext, layout: &DigitLayout, inter: &TimeInterpolation) {
+    ctx.set_stroke_width(layout.stroke_width);
+    ctx.set_stroke_color(color::GCOLOR_WHITE);
+
+    let mut digit = layout.first.clone();
+
+    let from = get_digits(&inter.from);
+    let to = get_digits(&inter.to);
+
+    render_interpolated_digit(ctx, &digit, from.0, to.0, inter.progress);
+    digit.base.y += layout.offset;
+    render_interpolated_digit(ctx, &digit, from.1, to.1, inter.progress);
+    digit.base.y += layout.offset;
+    render_interpolated_digit(ctx, &digit, from.2, to.2, inter.progress);
+    digit.base.y += layout.offset;
+    render_interpolated_digit(ctx, &digit, from.3, to.3, inter.progress);
 }

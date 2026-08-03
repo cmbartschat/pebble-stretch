@@ -196,7 +196,7 @@ dependencies = [
 [[package]]
 name = "pebble_rust_2026"
 version = "0.1.0"
-source = "git+https://github.com/cmbartschat/pebble-rust-2026.git?rev=44f2cd392e7cc3030673b9d90a4d627b50530b21#44f2cd392e7cc3030673b9d90a4d627b50530b21"
+source = "git+https://github.com/cmbartschat/pebble-rust-2026.git?rev=97b143e3a27932933a75cc661b031f8696f63ddc#97b143e3a27932933a75cc661b031f8696f63ddc"
 dependencies = [
  "bindgen",
  "bitflags",
@@ -218,7 +218,7 @@ dependencies = [
 [[package]]
 name = "proc"
 version = "0.1.0"
-source = "git+https://github.com/cmbartschat/pebble-rust-2026.git?rev=44f2cd392e7cc3030673b9d90a4d627b50530b21#44f2cd392e7cc3030673b9d90a4d627b50530b21"
+source = "git+https://github.com/cmbartschat/pebble-rust-2026.git?rev=97b143e3a27932933a75cc661b031f8696f63ddc#97b143e3a27932933a75cc661b031f8696f63ddc"
 dependencies = [
  "proc-macro2",
  "quote",
