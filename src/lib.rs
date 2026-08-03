@@ -2,6 +2,7 @@
 #![no_std]
 
 mod digits;
+mod grid;
 mod render;
 
 extern crate alloc;
@@ -42,7 +43,7 @@ fn main() -> i32 {
         })
     });
 
-    if true {
+    if false {
         APP.set_tick_handler(
             TimeUnits::Minute,
             Box::new({

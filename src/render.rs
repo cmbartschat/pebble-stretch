@@ -17,8 +17,8 @@ pub fn derive_layout(bounds: GRect) -> DigitLayout {
 
     const STROKE_COUNT: i16 = 12;
     const SPACE_COUNT: i16 = 11;
-    let space_width: i16 = base_scale * 4;
-    let stroke_width = (available - (space_width * STROKE_COUNT)) / SPACE_COUNT;
+    let stroke_width = base_scale * 4;
+    let space_width: i16 = (available - (stroke_width * STROKE_COUNT)) / SPACE_COUNT;
 
     let scale: i16 = space_width + stroke_width;
     let visible_bounds = GRect::new(0, 0, 11 * scale, 11 * scale).align(&bounds, GAlign::Center);

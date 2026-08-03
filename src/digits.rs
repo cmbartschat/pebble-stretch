@@ -1,10 +1,6 @@
 use pebble_rust_2026::{GContext, GPoint, GSize};
 
-#[derive(Clone)]
-pub struct DigitBounds {
-    pub base: GPoint,
-    pub scale: i16,
-}
+pub use crate::grid::DigitBounds;
 
 fn line(ctx: &mut GContext, from: GPoint, to: GSize, budget: &mut i32, allowance: i32) {
     if *budget <= 0 {
@@ -20,72 +16,6 @@ fn line(ctx: &mut GContext, from: GPoint, to: GSize, budget: &mut i32, allowance
     ctx.draw_line(
         from,
         GPoint::new(from.x + offset_x as i16, from.y + offset_y as i16),
-    );
-}
-
-fn left(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance: i32) {
-    line(
-        ctx,
-        GPoint::new(bounds.base.x, bounds.base.y),
-        GSize::new(0, 2 * bounds.scale),
-        budget,
-        allowance,
-    );
-}
-
-fn right(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance: i32) {
-    line(
-        ctx,
-        GPoint::new(bounds.base.x + bounds.scale * 11, bounds.base.y),
-        GSize::new(0, 2 * bounds.scale),
-        budget,
-        allowance,
-    );
-}
-
-fn left_top(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance: i32) {
-    line(
-        ctx,
-        GPoint::new(bounds.base.x, bounds.base.y + bounds.scale),
-        GSize::new(0, -bounds.scale),
-        budget,
-        allowance,
-    );
-}
-
-fn left_bottom(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance: i32) {
-    line(
-        ctx,
-        GPoint::new(bounds.base.x, bounds.base.y + bounds.scale),
-        GSize::new(0, bounds.scale),
-        budget,
-        allowance,
-    );
-}
-
-fn right_top(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance: i32) {
-    line(
-        ctx,
-        GPoint::new(
-            bounds.base.x + bounds.scale * 11,
-            bounds.base.y + bounds.scale,
-        ),
-        GSize::new(0, -bounds.scale),
-        budget,
-        allowance,
-    );
-}
-
-fn right_bottom(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance: i32) {
-    line(
-        ctx,
-        GPoint::new(
-            bounds.base.x + bounds.scale * 11,
-            bounds.base.y + bounds.scale,
-        ),
-        GSize::new(0, bounds.scale),
-        budget,
-        allowance,
     );
 }
 
@@ -123,10 +53,34 @@ fn bottom(ctx: &mut GContext, bounds: &DigitBounds, budget: &mut i32, allowance:
 }
 
 fn render_0(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 40);
-    bottom(ctx, bounds, &mut progress, 40);
-    left(ctx, bounds, &mut progress, 10);
-    right(ctx, bounds, &mut progress, 10);
+    line(
+        ctx,
+        bounds.left_top(),
+        bounds.move_right(),
+        &mut progress,
+        40,
+    );
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_down(),
+        &mut progress,
+        10,
+    );
+    line(
+        ctx,
+        bounds.right_bottom(),
+        bounds.move_left(),
+        &mut progress,
+        40,
+    );
+    line(
+        ctx,
+        bounds.left_bottom(),
+        bounds.move_up(),
+        &mut progress,
+        10,
+    );
 }
 
 fn render_1(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
@@ -150,60 +104,242 @@ fn render_1(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
 }
 
 fn render_2(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 30);
-    cross(ctx, bounds, &mut progress, 30);
-    bottom(ctx, bounds, &mut progress, 30);
-    left_bottom(ctx, bounds, &mut progress, 5);
-    right_top(ctx, bounds, &mut progress, 5);
+    line(
+        ctx,
+        bounds.left_top(),
+        bounds.move_right(),
+        &mut progress,
+        30,
+    );
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_half_down(),
+        &mut progress,
+        5,
+    );
+    line(
+        ctx,
+        bounds.right_cross(),
+        bounds.move_left(),
+        &mut progress,
+        30,
+    );
+    line(
+        ctx,
+        bounds.left_cross(),
+        bounds.move_half_down(),
+        &mut progress,
+        5,
+    );
+    line(
+        ctx,
+        bounds.left_bottom(),
+        bounds.move_right(),
+        &mut progress,
+        30,
+    );
 }
 
 fn render_3(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 30);
-    cross(ctx, bounds, &mut progress, 30);
-    bottom(ctx, bounds, &mut progress, 30);
-    right(ctx, bounds, &mut progress, 8);
+    line(
+        ctx,
+        bounds.left_top(),
+        bounds.move_right(),
+        &mut progress,
+        30,
+    );
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_down(),
+        &mut progress,
+        10,
+    );
+    line(
+        ctx,
+        bounds.right_bottom(),
+        bounds.move_left(),
+        &mut progress,
+        30,
+    );
+    line(
+        ctx,
+        bounds.left_cross(),
+        bounds.move_right(),
+        &mut progress,
+        30,
+    );
 }
 
 fn render_4(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    cross(ctx, bounds, &mut progress, 73);
-    left_top(ctx, bounds, &mut progress, 9);
-    right(ctx, bounds, &mut progress, 18);
+    line(
+        ctx,
+        bounds.left_top(),
+        bounds.move_half_down(),
+        &mut progress,
+        9,
+    );
+    line(
+        ctx,
+        bounds.left_cross(),
+        bounds.move_right(),
+        &mut progress,
+        73,
+    );
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_down(),
+        &mut progress,
+        18,
+    );
 }
 
 fn render_5(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 30);
-    cross(ctx, bounds, &mut progress, 30);
-    bottom(ctx, bounds, &mut progress, 30);
-    left_top(ctx, bounds, &mut progress, 5);
-    right_bottom(ctx, bounds, &mut progress, 5);
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_left(),
+        &mut progress,
+        30,
+    );
+    line(
+        ctx,
+        bounds.left_top(),
+        bounds.move_half_down(),
+        &mut progress,
+        5,
+    );
+    line(
+        ctx,
+        bounds.left_cross(),
+        bounds.move_right(),
+        &mut progress,
+        30,
+    );
+    line(
+        ctx,
+        bounds.right_cross(),
+        bounds.move_half_down(),
+        &mut progress,
+        5,
+    );
+    line(
+        ctx,
+        bounds.right_bottom(),
+        bounds.move_left(),
+        &mut progress,
+        30,
+    );
 }
 
 fn render_6(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 29);
-    cross(ctx, bounds, &mut progress, 29);
-    bottom(ctx, bounds, &mut progress, 29);
-    left(ctx, bounds, &mut progress, 8);
-    right_bottom(ctx, bounds, &mut progress, 5);
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_left(),
+        &mut progress,
+        29,
+    );
+
+    line(ctx, bounds.left_top(), bounds.move_down(), &mut progress, 8);
+
+    line(
+        ctx,
+        bounds.left_bottom(),
+        bounds.move_right(),
+        &mut progress,
+        29,
+    );
+
+    line(
+        ctx,
+        bounds.right_bottom(),
+        bounds.move_half_up(),
+        &mut progress,
+        5,
+    );
+
+    line(
+        ctx,
+        bounds.right_cross(),
+        bounds.move_left(),
+        &mut progress,
+        29,
+    );
 }
 
 fn render_7(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 80);
-    right(ctx, bounds, &mut progress, 20);
+    line(
+        ctx,
+        bounds.right_bottom(),
+        bounds.move_up(),
+        &mut progress,
+        20,
+    );
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_left(),
+        &mut progress,
+        80,
+    );
 }
 
 fn render_8(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 28);
-    cross(ctx, bounds, &mut progress, 28);
-    bottom(ctx, bounds, &mut progress, 28);
-    left(ctx, bounds, &mut progress, 8);
-    right(ctx, bounds, &mut progress, 8);
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_left(),
+        &mut progress,
+        28,
+    );
+
+    line(ctx, bounds.left_top(), bounds.move_down(), &mut progress, 8);
+
+    line(
+        ctx,
+        bounds.left_bottom(),
+        bounds.move_right(),
+        &mut progress,
+        28,
+    );
+
+    line(
+        ctx,
+        bounds.right_bottom(),
+        bounds.move_up(),
+        &mut progress,
+        8,
+    );
+
+    line(
+        ctx,
+        bounds.right_cross(),
+        bounds.move_left(),
+        &mut progress,
+        28,
+    );
 }
 
 fn render_9(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
-    top(ctx, bounds, &mut progress, 42);
     cross(ctx, bounds, &mut progress, 42);
-    left_top(ctx, bounds, &mut progress, 6);
-    right(ctx, bounds, &mut progress, 10);
+    line(
+        ctx,
+        bounds.left_cross(),
+        bounds.move_half_up(),
+        &mut progress,
+        6,
+    );
+    top(ctx, bounds, &mut progress, 42);
+    line(
+        ctx,
+        bounds.right_top(),
+        bounds.move_down(),
+        &mut progress,
+        6,
+    );
 }
 
 pub fn render_digit(d: i32, ctx: &mut GContext, bounds: &DigitBounds, progress: i32) {
