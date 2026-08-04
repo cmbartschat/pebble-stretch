@@ -1,6 +1,9 @@
-use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, LocalTime, color, resource_ids};
+use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, color, resource_ids};
 
-use crate::digits::{DigitBounds, render_digit};
+use crate::{
+    animation::{InterpolatedDigit, InterpolatedTime},
+    digits::*,
+};
 
 resource_ids!(resource_ids);
 
@@ -36,58 +39,70 @@ pub fn derive_layout(bounds: GRect) -> DigitLayout {
     }
 }
 
-fn get_digits(time: &LocalTime) -> (i32, i32, i32, i32) {
-    let mut hour = time.hour();
-    if hour == 0 {
-        hour = 12;
-    } else if hour > 12 {
-        hour -= 12;
-    }
-
-    (
-        hour.div_euclid(10),
-        hour.rem_euclid(10),
-        time.minute().div_euclid(10),
-        time.minute().rem_euclid(10),
-    )
-}
-
-pub struct TimeInterpolation {
-    pub(crate) progress: i32,
-    pub(crate) from: LocalTime,
-    pub(crate) to: LocalTime,
-}
-
 pub fn render_interpolated_digit(
     ctx: &mut GContext,
     bounds: &DigitBounds,
-    old: i32,
-    new: i32,
+    digit: &InterpolatedDigit,
     progress: i32,
 ) {
-    if old == new {
-        render_digit(new, ctx, bounds, 100);
-    } else if progress < 0 {
-        render_digit(old, ctx, bounds, -progress);
-    } else {
-        render_digit(new, ctx, bounds, progress);
-    }
+    match digit {
+        InterpolatedDigit::Stable(e) => render_digit(*e, ctx, bounds, 100),
+        InterpolatedDigit::Change(old, new) if *old == 0 && *new == 1 => {
+            render_0_1(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 1 && *new == 2 => {
+            render_1_2(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 2 && *new == 3 => {
+            render_2_3(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 3 && *new == 4 => {
+            render_3_4(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 4 && *new == 5 => {
+            render_4_5(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 5 && *new == 6 => {
+            render_5_6(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 6 && *new == 7 => {
+            render_6_7(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 7 && *new == 8 => {
+            render_7_8(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 8 && *new == 9 => {
+            render_8_9(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 9 && *new == 0 => {
+            render_9_0(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 2 && *new == 1 => {
+            render_2_1(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 1 && *new == 0 => {
+            render_1_0(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 5 && *new == 0 => {
+            render_5_0(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, _) if progress < 0 => {
+            render_digit(*old, ctx, bounds, -progress)
+        }
+        InterpolatedDigit::Change(_, new) => render_digit(*new, ctx, bounds, progress),
+    };
 }
 
-pub fn render_animated_time(ctx: &mut GContext, layout: &DigitLayout, inter: &TimeInterpolation) {
+pub fn render_animated_time(ctx: &mut GContext, layout: &DigitLayout, inter: &InterpolatedTime) {
     ctx.set_stroke_width(layout.stroke_width);
     ctx.set_stroke_color(color::GCOLOR_WHITE);
 
     let mut digit = layout.first.clone();
-
-    let from = get_digits(&inter.from);
-    let to = get_digits(&inter.to);
-
-    render_interpolated_digit(ctx, &digit, from.0, to.0, inter.progress);
+    render_interpolated_digit(ctx, &digit, &inter.digits.0, inter.progress);
     digit.base.y += layout.offset;
-    render_interpolated_digit(ctx, &digit, from.1, to.1, inter.progress);
+    render_interpolated_digit(ctx, &digit, &inter.digits.1, inter.progress);
     digit.base.y += layout.offset;
-    render_interpolated_digit(ctx, &digit, from.2, to.2, inter.progress);
+    render_interpolated_digit(ctx, &digit, &inter.digits.2, inter.progress);
     digit.base.y += layout.offset;
-    render_interpolated_digit(ctx, &digit, from.3, to.3, inter.progress);
+    render_interpolated_digit(ctx, &digit, &inter.digits.3, inter.progress);
 }

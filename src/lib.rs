@@ -1,7 +1,9 @@
 #![no_main]
 #![no_std]
 
+mod animation;
 mod digits;
+mod format;
 mod grid;
 mod render;
 
@@ -15,7 +17,10 @@ use pebble_rust_2026::{
     self as _, APP, Layer, Time, TimeUnits, Timer, Window, hex_color, resource_ids,
 };
 
-use crate::render::{TimeInterpolation, derive_layout, render_animated_time};
+use crate::{
+    animation::InterpolatedTime,
+    render::{derive_layout, render_animated_time},
+};
 
 resource_ids!(resource_ids);
 
@@ -26,13 +31,7 @@ fn main() -> i32 {
 
     let mut layer = Layer::new(window.get_bounds().shrink(5)).unwrap();
 
-    let now = Time::now();
-    let now_seconds = now.epoch_seconds();
-    let progress = Rc::new(RefCell::new(TimeInterpolation {
-        from: Time::from_epoch_seconds(now_seconds + (11 * 60 * 60) + 11 * 60).to_local(),
-        progress: 0,
-        to: now.to_local(),
-    }));
+    let progress = Rc::new(RefCell::new(InterpolatedTime::new(Time::now())));
 
     layer.set_update_proc({
         let progress = progress.clone();
@@ -51,53 +50,68 @@ fn main() -> i32 {
                 let progress = progress.clone();
                 move || {
                     {
-                        let mut progress = progress.borrow_mut();
-                        *progress = TimeInterpolation {
-                            progress: -progress.progress,
-                            from: progress.to.clone(),
-                            to: Time::now().to_local(),
-                        };
+                        progress.borrow_mut().animate_to_time(Time::now());
                         layer.mark_dirty();
                     }
                     let progress = progress.clone();
                     let mut layer = layer.clone();
                     Timer::repeat(Duration::from_millis(25), move || {
                         layer.mark_dirty();
-                        let mut progress = progress.borrow_mut();
-                        progress.progress += 5;
-                        progress.progress < 100
+                        progress.borrow_mut().advance(2)
                     });
                 }
             }),
         );
     } else {
-        Timer::repeat(Duration::from_secs(3), {
-            let mut layer = layer.clone();
+        let mut layer = layer.clone();
+        let progress = progress.clone();
+        let digits = (0, 0, 0, 5);
+
+        {
+            let mut progress = progress.borrow_mut();
+            progress.animate_to_digits(digits);
+            progress.advance(10000);
+        }
+
+        type Type = Option<Box<dyn FnMut() + 'static>>;
+        let start_next_animation: Rc<RefCell<Type>> = Rc::new(RefCell::new(None));
+
+        let start_next_animation_inner = {
             let progress = progress.clone();
-            let mut seconds = 0;
+            let start_next_animation = start_next_animation.clone();
+            let mut digits = digits;
             move || {
-                seconds += 60;
+                digits.0 = (digits.0 + 1) % 2;
+                digits.1 = (digits.1 + 1) % 6;
+                digits.2 = (digits.2 + 1) % 10;
+                digits.3 = (digits.3 + 1) % 10;
                 {
-                    let mut progress = progress.borrow_mut();
-                    *progress = TimeInterpolation {
-                        progress: -progress.progress,
-                        from: progress.to.clone(),
-                        to: Time::from_epoch_seconds(seconds).to_local(),
-                    };
+                    progress.borrow_mut().animate_to_digits(digits);
                     layer.mark_dirty();
                 }
-                let progress = progress.clone();
+
+                let start_next_animation = start_next_animation.clone();
                 let mut layer = layer.clone();
+                let progress = progress.clone();
                 Timer::repeat(Duration::from_millis(25), move || {
                     layer.mark_dirty();
-                    let mut progress = progress.borrow_mut();
-                    progress.progress += 5;
-                    progress.progress < 100
+                    if progress.borrow_mut().advance(2) {
+                        true
+                    } else {
+                        let start_next_animation = start_next_animation.clone();
+                        Timer::once(Duration::from_millis(500), move || {
+                            (start_next_animation.borrow_mut().as_mut().unwrap())();
+                        });
+                        false
+                    }
                 });
-
-                true
             }
-        });
+        };
+        start_next_animation
+            .borrow_mut()
+            .replace(Box::new(start_next_animation_inner));
+
+        (start_next_animation.borrow_mut().as_mut().unwrap())();
     }
 
     APP.unobstructed_area.subscribe(Box::new({
