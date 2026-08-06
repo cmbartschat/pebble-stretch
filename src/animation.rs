@@ -37,15 +37,14 @@ pub struct InterpolatedTime {
 }
 
 impl InterpolatedTime {
-    pub fn new(time: Time) -> Self {
-        let digits = get_digits(&time.to_local());
+    pub fn new() -> Self {
         Self {
             progress: 0,
             digits: (
-                InterpolatedDigit::Change(-1, digits.0),
-                InterpolatedDigit::Change(-1, digits.1),
-                InterpolatedDigit::Change(-1, digits.2),
-                InterpolatedDigit::Change(-1, digits.3),
+                InterpolatedDigit::Change(-1, -1),
+                InterpolatedDigit::Change(-1, -1),
+                InterpolatedDigit::Change(-1, -1),
+                InterpolatedDigit::Change(-1, -1),
             ),
         }
     }

@@ -34,7 +34,7 @@ fn main() -> i32 {
 
     let mut layer = Layer::new(window.get_bounds().shrink(5)).unwrap();
 
-    let progress = Rc::new(RefCell::new(InterpolatedTime::new(Time::now())));
+    let progress = Rc::new(RefCell::new(InterpolatedTime::new()));
 
     layer.set_update_proc({
         let progress = progress.clone();
@@ -45,7 +45,7 @@ fn main() -> i32 {
         })
     });
 
-    if false {
+    if true {
         APP.set_tick_handler(
             TimeUnits::Minute,
             Box::new({
@@ -60,7 +60,7 @@ fn main() -> i32 {
                     let mut layer = layer.clone();
                     Timer::repeat(Duration::from_millis(FRAME_TIME), move || {
                         layer.mark_dirty();
-                        progress.borrow_mut().advance(2)
+                        progress.borrow_mut().advance(TIME_STEP)
                     });
                 }
             }),
