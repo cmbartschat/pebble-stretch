@@ -84,9 +84,9 @@ pub fn render_interpolated_digit(
         InterpolatedDigit::Change(old, new) if *old == 1 && *new == 0 => {
             render_1_0(ctx, bounds, progress)
         }
-        // InterpolatedDigit::Change(old, new) if *old == 5 && *new == 0 => {
-        //     render_5_0(ctx, bounds, progress)
-        // }
+        InterpolatedDigit::Change(old, new) if *old == 5 && *new == 0 => {
+            render_5_0(ctx, bounds, progress)
+        }
         InterpolatedDigit::Change(_, new) => render_digit(*new, ctx, bounds, progress),
     };
 }
