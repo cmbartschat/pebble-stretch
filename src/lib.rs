@@ -84,7 +84,7 @@ fn main() -> i32 {
             let start_next_animation = start_next_animation.clone();
             let mut digits = digits;
             move || {
-                digits.0 = (digits.0 + 1) % 2;
+                digits.0 = if digits.0 == 1 { 2 } else { 1 };
                 digits.1 = (digits.1 + 1) % 6;
                 digits.2 = (digits.2 + 1) % 10;
                 digits.3 = (digits.3 + 1) % 10;

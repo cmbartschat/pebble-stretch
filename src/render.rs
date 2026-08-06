@@ -78,9 +78,9 @@ pub fn render_interpolated_digit(
         InterpolatedDigit::Change(old, new) if *old == 9 && *new == 0 => {
             render_9_0(ctx, bounds, progress)
         }
-        // InterpolatedDigit::Change(old, new) if *old == 2 && *new == 1 => {
-        //     render_2_1(ctx, bounds, progress)
-        // }
+        InterpolatedDigit::Change(old, new) if *old == 2 && *new == 1 => {
+            render_2_1(ctx, bounds, progress)
+        }
         InterpolatedDigit::Change(old, new) if *old == 1 && *new == 0 => {
             render_1_0(ctx, bounds, progress)
         }
