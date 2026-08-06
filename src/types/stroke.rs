@@ -32,7 +32,7 @@ impl Stroke {
     pub fn render(&self, ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) -> bool {
         progress -= self.delay;
         if self.back {
-            progress *= -1;
+            progress = self.duration() - progress;
         }
         for seg in self.segments {
             seg.render(ctx, bounds, &mut progress);

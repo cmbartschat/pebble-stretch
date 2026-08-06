@@ -48,12 +48,12 @@ pub fn render_interpolated_digit(
 ) {
     match digit {
         InterpolatedDigit::Stable(e) => render_digit(*e, ctx, bounds, MAX_TIME),
-        // InterpolatedDigit::Change(old, new) if *old == 0 && *new == 1 => {
-        //     render_0_1(ctx, bounds, progress)
-        // }
-        // InterpolatedDigit::Change(old, new) if *old == 1 && *new == 2 => {
-        //     render_1_2(ctx, bounds, progress)
-        // }
+        InterpolatedDigit::Change(old, new) if *old == 0 && *new == 1 => {
+            render_0_1(ctx, bounds, progress)
+        }
+        InterpolatedDigit::Change(old, new) if *old == 1 && *new == 2 => {
+            render_1_2(ctx, bounds, progress)
+        }
         // InterpolatedDigit::Change(old, new) if *old == 2 && *new == 3 => {
         //     render_2_3(ctx, bounds, progress)
         // }
@@ -81,15 +81,12 @@ pub fn render_interpolated_digit(
         // InterpolatedDigit::Change(old, new) if *old == 2 && *new == 1 => {
         //     render_2_1(ctx, bounds, progress)
         // }
-        // InterpolatedDigit::Change(old, new) if *old == 1 && *new == 0 => {
-        //     render_1_0(ctx, bounds, progress)
-        // }
+        InterpolatedDigit::Change(old, new) if *old == 1 && *new == 0 => {
+            render_1_0(ctx, bounds, progress)
+        }
         // InterpolatedDigit::Change(old, new) if *old == 5 && *new == 0 => {
         //     render_5_0(ctx, bounds, progress)
         // }
-        InterpolatedDigit::Change(old, _) if progress < 0 => {
-            render_digit(*old, ctx, bounds, -progress)
-        }
         InterpolatedDigit::Change(_, new) => render_digit(*new, ctx, bounds, progress),
     };
 }
