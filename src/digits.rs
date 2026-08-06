@@ -249,9 +249,27 @@ pub fn render_4_5(ctx: &mut GContext, bounds: &DigitBounds, progress: i32) {
     TRANSITION.render(ctx, bounds, progress);
 }
 
-// pub fn render_5_6(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
+pub fn render_5_6(ctx: &mut GContext, bounds: &DigitBounds, progress: i32) {
+    static ALWAYS: Transition = Transition::def(&[Stroke::forward(
+        0,
+        &[
+            Seg::def(Pos::Tl, Dir::R),
+            Seg::def(Pos::Cl, Dir::Hu),
+            Seg::def(Pos::Cr, Dir::L),
+            Seg::def(Pos::Cr, Dir::Hd),
+        ],
+    )]);
+    static TRANSITION: Transition = Transition::def(&[
+        Stroke::back(0, &[Seg::def(Pos::Br, Dir::L)]),
+        Stroke::forward(
+            3 * TIME_SCALE,
+            &[Seg::def(Pos::Cl, Dir::Hd), Seg::def(Pos::Bl, Dir::R)],
+        ),
+    ]);
 
-// }
+    ALWAYS.render(ctx, bounds, MAX_TIME);
+    TRANSITION.render(ctx, bounds, progress);
+}
 
 // pub fn render_6_7(ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
 
