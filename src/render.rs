@@ -66,9 +66,9 @@ pub fn render_interpolated_digit(
         InterpolatedDigit::Change(old, new) if *old == 5 && *new == 6 => {
             render_5_6(ctx, bounds, progress)
         }
-        // InterpolatedDigit::Change(old, new) if *old == 6 && *new == 7 => {
-        //     render_6_7(ctx, bounds, progress)
-        // }
+        InterpolatedDigit::Change(old, new) if *old == 6 && *new == 7 => {
+            render_6_7(ctx, bounds, progress)
+        }
         // InterpolatedDigit::Change(old, new) if *old == 7 && *new == 8 => {
         //     render_7_8(ctx, bounds, progress)
         // }
