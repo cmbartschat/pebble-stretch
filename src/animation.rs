@@ -1,6 +1,6 @@
 use pebble_rust_2026::{Time, resource_ids};
 
-use crate::format::get_digits;
+use crate::{format::get_digits, time::MAX_TIME};
 
 resource_ids!(resource_ids);
 
@@ -52,7 +52,7 @@ impl InterpolatedTime {
 
     pub fn advance(&mut self, by: i32) -> bool {
         self.progress += by;
-        self.progress < 100
+        self.progress < MAX_TIME // todo
     }
 
     pub fn animate_to_time(&mut self, time: Time) {
@@ -62,7 +62,7 @@ impl InterpolatedTime {
 
     pub fn animate_to_digits(&mut self, digits: (i32, i32, i32, i32)) {
         *self = Self {
-            progress: -100,
+            progress: 0,
             digits: (
                 InterpolatedDigit::between(self.digits.0.end(), digits.0),
                 InterpolatedDigit::between(self.digits.1.end(), digits.1),

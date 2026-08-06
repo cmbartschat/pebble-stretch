@@ -51,4 +51,8 @@ impl DigitBounds {
             self.base.y + self.scale + self.scale,
         )
     }
+
+    pub fn move_left_one_segment(&self) -> GSize {
+        GSize::new(-self.scale, 0)
+    }
 }

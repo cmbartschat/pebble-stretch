@@ -6,6 +6,8 @@ mod digits;
 mod format;
 mod grid;
 mod render;
+mod time;
+mod types;
 
 extern crate alloc;
 
@@ -20,6 +22,7 @@ use pebble_rust_2026::{
 use crate::{
     animation::InterpolatedTime,
     render::{derive_layout, render_animated_time},
+    time::{FRAME_TIME, MAX_TIME, TIME_STEP},
 };
 
 resource_ids!(resource_ids);
@@ -55,7 +58,7 @@ fn main() -> i32 {
                     }
                     let progress = progress.clone();
                     let mut layer = layer.clone();
-                    Timer::repeat(Duration::from_millis(25), move || {
+                    Timer::repeat(Duration::from_millis(FRAME_TIME), move || {
                         layer.mark_dirty();
                         progress.borrow_mut().advance(2)
                     });
@@ -70,7 +73,7 @@ fn main() -> i32 {
         {
             let mut progress = progress.borrow_mut();
             progress.animate_to_digits(digits);
-            progress.advance(10000);
+            progress.advance(MAX_TIME);
         }
 
         type Type = Option<Box<dyn FnMut() + 'static>>;
@@ -93,13 +96,13 @@ fn main() -> i32 {
                 let start_next_animation = start_next_animation.clone();
                 let mut layer = layer.clone();
                 let progress = progress.clone();
-                Timer::repeat(Duration::from_millis(25), move || {
+                Timer::repeat(Duration::from_millis(FRAME_TIME), move || {
                     layer.mark_dirty();
-                    if progress.borrow_mut().advance(2) {
+                    if progress.borrow_mut().advance(TIME_STEP) {
                         true
                     } else {
                         let start_next_animation = start_next_animation.clone();
-                        Timer::once(Duration::from_millis(500), move || {
+                        Timer::once(Duration::from_millis(1000), move || {
                             (start_next_animation.borrow_mut().as_mut().unwrap())();
                         });
                         false
