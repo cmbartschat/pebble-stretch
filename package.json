@@ -21,11 +21,11 @@
         "displayName": "Stretch",
         "enableMultiJS": true,
         "messageKeys": [
-            "BACKGROUND_COLOR",
-            "COLOR_0",
-            "COLOR_1",
-            "COLOR_2",
-            "COLOR_3"
+            "CONFIG_BACKGROUND_COLOR",
+            "CONFIG_DIGIT_0_COLOR",
+            "CONFIG_DIGIT_1_COLOR",
+            "CONFIG_DIGIT_2_COLOR",
+            "CONFIG_DIGIT_3_COLOR"
         ],
         "projectType": "native",
         "resources": {
@@ -35,7 +35,7 @@
         "targetPlatforms": [
             "emery"
         ],
-        "uuid": "712f4a44-4112-460e-b266-f91e439fb3e0",
+        "uuid": "d6d54026-9344-4717-afb1-d006c72f2471",
         "watchapp": {
             "watchface": true
         }

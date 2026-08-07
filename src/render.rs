@@ -1,7 +1,8 @@
-use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, GSize, color, resource_ids};
+use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, GSize, resource_ids};
 
 use crate::{
     animation::{InterpolatedDigit, InterpolatedTime, Status},
+    config::Config,
     digits::*,
     time::MAX_TIME,
 };
@@ -96,12 +97,13 @@ pub fn render_animated_time(
     ctx: &mut GContext,
     layout: &DigitLayout,
     inter: &InterpolatedTime,
+    config: &Config,
 ) -> Status {
     ctx.set_stroke_width(layout.stroke_width);
-    ctx.set_stroke_color(color::GCOLOR_WHITE);
 
     let mut status = Status::Complete;
 
+    ctx.set_stroke_color(config.digit_colors.0);
     let mut digit = layout.first.clone();
     status.join(render_interpolated_digit(
         ctx,
@@ -110,6 +112,7 @@ pub fn render_animated_time(
         inter.progress,
     ));
     digit.base.y += layout.offset;
+    ctx.set_stroke_color(config.digit_colors.1);
     status.join(render_interpolated_digit(
         ctx,
         &digit,
@@ -117,6 +120,7 @@ pub fn render_animated_time(
         inter.progress,
     ));
     digit.base.y += layout.offset;
+    ctx.set_stroke_color(config.digit_colors.2);
     status.join(render_interpolated_digit(
         ctx,
         &digit,
@@ -124,6 +128,7 @@ pub fn render_animated_time(
         inter.progress,
     ));
     digit.base.y += layout.offset;
+    ctx.set_stroke_color(config.digit_colors.3);
     status.join(render_interpolated_digit(
         ctx,
         &digit,

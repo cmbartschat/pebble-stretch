@@ -2,6 +2,7 @@
 #![no_std]
 
 mod animation;
+mod config;
 mod demo_trigger;
 mod digits;
 mod fast_time_trigger;
@@ -18,10 +19,11 @@ use core::cell::RefCell;
 
 use alloc::{boxed::Box, rc::Rc};
 
-use pebble_rust_2026::{self as _, APP, Layer, Window, hex_color, resource_ids};
+use pebble_rust_2026::{self as _, APP, Layer, Window, resource_ids};
 
 use crate::{
     animation::{ContinuousInterpolation, InterpolatedTime, Status},
+    config::load_config,
     demo_trigger::DemoTrigger,
     fast_time_trigger::FastTimeTrigger,
     render::{derive_layout, render_animated_time},
@@ -33,9 +35,18 @@ resource_ids!(resource_ids);
 #[unsafe(no_mangle)]
 fn main() -> i32 {
     let mut window = Window::new().unwrap();
-    window.set_background_color(hex_color!("#000"));
 
     let mut layer = Layer::new(window.get_bounds().shrink(5)).unwrap();
+
+    let config = load_config({
+        let mut window = window.retain();
+        let mut layer = layer.clone();
+        Box::new(move |config| {
+            // Also fires on startup
+            window.set_background_color(config.background_color);
+            layer.mark_dirty();
+        })
+    });
 
     let progress = Rc::new(RefCell::new(InterpolatedTime::new()));
 
@@ -44,8 +55,9 @@ fn main() -> i32 {
         Box::new(move |layer, mut ctx| {
             let mut progress = progress.borrow_mut();
             let layout = derive_layout(layer.get_unobstructed_bounds());
+            let config = config.borrow();
             progress.stage_complete =
-                render_animated_time(&mut ctx, &layout, &progress) == Status::Complete;
+                render_animated_time(&mut ctx, &layout, &progress, &config) == Status::Complete;
         })
     });
 

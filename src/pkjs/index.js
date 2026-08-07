@@ -2,18 +2,26 @@ var Clay = require('pebble-clay')
 var clayConfig = require('./config')
 var clay = new Clay(clayConfig)
 
-const sendState = () => {
-  Pebble.sendAppMessage(JSON.parse(localStorage.getItem('config')))
+const refresh = () => {
+  const config = localStorage.getItem('config')
+  if (config) {
+    Pebble.sendAppMessage(JSON.parse(config))
+  }
 }
+
+refresh()
 
 Pebble.addEventListener('webviewclosed', function (e) {
   if (e && !e.response) {
     return
   }
 
-  console.log(e.response)
-  localStorage.setItem('config', e.response)
-  refresh()
-})
+  let config = Object.fromEntries(
+    Object.entries(JSON.parse(e.response)).map((e) => [e[0], e[1].value])
+  )
 
-refresh()
+  localStorage.setItem('config', JSON.stringify(config))
+  console.log('sending config', config)
+  Pebble.sendAppMessage(config)
+  console.log('sent config')
+})
