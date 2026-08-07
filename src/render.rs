@@ -1,7 +1,7 @@
 use pebble_rust_2026::{GAlign, GContext, GPoint, GRect, GSize, color, resource_ids};
 
 use crate::{
-    animation::{InterpolatedDigit, InterpolatedTime},
+    animation::{InterpolatedDigit, InterpolatedTime, Status},
     digits::*,
     time::MAX_TIME,
 };
@@ -45,7 +45,7 @@ pub fn render_interpolated_digit(
     bounds: &DigitBounds,
     digit: &InterpolatedDigit,
     progress: i32,
-) {
+) -> Status {
     match digit {
         InterpolatedDigit::Stable(e) => render_digit(*e, ctx, bounds, MAX_TIME),
         InterpolatedDigit::Change(old, new) if *old == 0 && *new == 1 => {
@@ -87,22 +87,51 @@ pub fn render_interpolated_digit(
         InterpolatedDigit::Change(old, new) if *old == 5 && *new == 0 => {
             render_5_0(ctx, bounds, progress)
         }
+        InterpolatedDigit::Change(old, -1) => render_digit_reverse(*old, ctx, bounds, progress),
         InterpolatedDigit::Change(_, new) => render_digit(*new, ctx, bounds, progress),
-    };
+    }
 }
 
-pub fn render_animated_time(ctx: &mut GContext, layout: &DigitLayout, inter: &InterpolatedTime) {
+pub fn render_animated_time(
+    ctx: &mut GContext,
+    layout: &DigitLayout,
+    inter: &InterpolatedTime,
+) -> Status {
     ctx.set_stroke_width(layout.stroke_width);
     ctx.set_stroke_color(color::GCOLOR_WHITE);
 
+    let mut status = Status::Complete;
+
     let mut digit = layout.first.clone();
-    render_interpolated_digit(ctx, &digit, &inter.digits.0, inter.progress);
+    status.join(render_interpolated_digit(
+        ctx,
+        &digit,
+        &inter.digits.0,
+        inter.progress,
+    ));
     digit.base.y += layout.offset;
-    render_interpolated_digit(ctx, &digit, &inter.digits.1, inter.progress);
+    status.join(render_interpolated_digit(
+        ctx,
+        &digit,
+        &inter.digits.1,
+        inter.progress,
+    ));
     digit.base.y += layout.offset;
-    render_interpolated_digit(ctx, &digit, &inter.digits.2, inter.progress);
+    status.join(render_interpolated_digit(
+        ctx,
+        &digit,
+        &inter.digits.2,
+        inter.progress,
+    ));
     digit.base.y += layout.offset;
-    render_interpolated_digit(ctx, &digit, &inter.digits.3, inter.progress);
+    status.join(render_interpolated_digit(
+        ctx,
+        &digit,
+        &inter.digits.3,
+        inter.progress,
+    ));
+
+    status
 }
 
 pub fn render_line(ctx: &mut GContext, from: GPoint, to: GSize, budget: &mut i32, allowance: i32) {

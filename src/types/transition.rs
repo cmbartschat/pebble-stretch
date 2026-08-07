@@ -1,6 +1,6 @@
 use pebble_rust_2026::GContext;
 
-use crate::{grid::DigitBounds, types::Stroke};
+use crate::{animation::Status, grid::DigitBounds, types::Stroke};
 
 pub struct Transition {
     strokes: &'static [Stroke],
@@ -11,11 +11,19 @@ impl Transition {
         Self { strokes }
     }
 
-    pub fn render(&self, ctx: &mut GContext, bounds: &DigitBounds, progress: i32) -> bool {
-        let mut pending = false;
+    pub fn render(&self, ctx: &mut GContext, bounds: &DigitBounds, progress: i32) -> Status {
         for stroke in self.strokes {
-            pending = stroke.render(ctx, bounds, progress) || pending;
+            stroke.render(ctx, bounds, progress);
         }
-        pending
+
+        if progress < self.duration() {
+            Status::Active
+        } else {
+            Status::Complete
+        }
+    }
+
+    pub(crate) fn duration(&self) -> i32 {
+        self.strokes.iter().map(|e| e.duration()).max().unwrap_or(0)
     }
 }

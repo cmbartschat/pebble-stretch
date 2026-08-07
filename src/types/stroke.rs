@@ -26,17 +26,20 @@ impl Stroke {
     }
 
     pub fn duration(&self) -> i32 {
-        self.delay + self.segments.iter().map(|e| e.duration()).sum::<i32>()
+        self.delay + self.inner_duration()
     }
 
-    pub fn render(&self, ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) -> bool {
+    fn inner_duration(&self) -> i32 {
+        self.segments.iter().map(|e| e.duration()).sum::<i32>()
+    }
+
+    pub fn render(&self, ctx: &mut GContext, bounds: &DigitBounds, mut progress: i32) {
         progress -= self.delay;
         if self.back {
-            progress = self.duration() - progress;
+            progress = self.inner_duration() - progress;
         }
         for seg in self.segments {
             seg.render(ctx, bounds, &mut progress);
         }
-        progress <= 0
     }
 }
