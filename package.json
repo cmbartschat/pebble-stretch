@@ -1,9 +1,9 @@
 {
     "author": "Christoph Bartschat",
     "dependencies": {
-        "base-x": "^5.0.1",
         "pebble-clay": "^1.0.0"
     },
+    "description": "Minimalist watchface with animated digits",
     "keywords": [
         "pebble-app"
     ],
@@ -40,5 +40,5 @@
             "watchface": true
         }
     },
-    "version": "1.0.3"
+    "version": "1.0.0"
 }
