@@ -11,6 +11,7 @@ mod grid;
 mod render;
 mod time;
 mod time_trigger;
+mod tricky_trigger;
 mod types;
 
 extern crate alloc;
@@ -28,6 +29,7 @@ use crate::{
     fast_time_trigger::FastTimeTrigger,
     render::{derive_layout, render_animated_time},
     time_trigger::TimeTrigger,
+    tricky_trigger::TrickyTrigger,
 };
 
 resource_ids!(resource_ids);
@@ -79,12 +81,14 @@ fn main() -> i32 {
         Time,
         FastTime,
         Demo,
+        Tricky,
     }
 
     match Trigger::Time {
         Trigger::Time => TimeTrigger::mount(inter),
         Trigger::FastTime => FastTimeTrigger::mount(inter),
         Trigger::Demo => DemoTrigger::mount(inter),
+        Trigger::Tricky => TrickyTrigger::mount(inter),
     }
 
     APP.show(window);

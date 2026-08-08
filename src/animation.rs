@@ -168,6 +168,7 @@ pub struct ContinuousInterpolation {
     pub(crate) time: Rc<RefCell<InterpolatedTime>>,
     target: (i32, i32, i32, i32),
     timer: Option<Timer>,
+    finished: bool,
 }
 
 impl ContinuousInterpolation {
@@ -177,6 +178,7 @@ impl ContinuousInterpolation {
             time,
             target: (-1, -1, -1, -1),
             timer: None,
+            finished: true,
         }));
 
         Some(state)
@@ -185,6 +187,7 @@ impl ContinuousInterpolation {
     pub fn set_target_direct(me: &Rc<RefCell<Self>>, digits: (i32, i32, i32, i32)) {
         let mut state = me.borrow_mut();
         state.target = digits;
+        state.finished = false;
 
         {
             let mut progress = state.time.borrow_mut();
@@ -200,24 +203,32 @@ impl ContinuousInterpolation {
             move || {
                 let mut state = state.borrow_mut();
                 state.layer.mark_dirty();
-                let mut progress = state.time.borrow_mut();
-                if progress.stage_complete {
-                    progress.step_towards(state.target);
-                } else {
-                    progress.advance(TIME_STEP);
+                {
+                    let mut progress = state.time.borrow_mut();
+                    if progress.stage_complete {
+                        progress.step_towards(state.target);
+                    } else {
+                        progress.advance(TIME_STEP);
+                    }
+                    if progress.progress < MAX_TIME {
+                        return true;
+                    }
                 }
-                if progress.progress < MAX_TIME {
-                    return true;
-                }
+                state.finished = true;
                 false
             }
         });
+    }
+
+    pub fn finished(&self) -> bool {
+        self.finished
     }
 
     pub fn set_target(me: &Rc<RefCell<Self>>, digits: (i32, i32, i32, i32)) {
         let mut state = me.borrow_mut();
         state.target = digits;
         state.layer.mark_dirty();
+        state.finished = false;
 
         {
             let mut progress = state.time.borrow_mut();
@@ -233,15 +244,18 @@ impl ContinuousInterpolation {
             move || {
                 let mut state = state.borrow_mut();
                 state.layer.mark_dirty();
-                let mut progress = state.time.borrow_mut();
-                if progress.stage_complete {
-                    progress.step_towards(state.target);
-                } else {
-                    progress.advance(TIME_STEP);
+                {
+                    let mut progress = state.time.borrow_mut();
+                    if progress.stage_complete {
+                        progress.step_towards(state.target);
+                    } else {
+                        progress.advance(TIME_STEP);
+                    }
+                    if progress.progress < MAX_TIME {
+                        return true;
+                    }
                 }
-                if progress.progress < MAX_TIME {
-                    return true;
-                }
+                state.finished = true;
                 false
             }
         });
