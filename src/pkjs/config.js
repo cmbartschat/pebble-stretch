@@ -5,7 +5,7 @@ module.exports = [
       {
         type: 'color',
         label: 'Background Color',
-        messageKey: 'CONFIG_BACKGROUND',
+        messageKey: 'CONFIG_BACKGROUND_COLOR',
         defaultValue: '#000000',
       },
       {

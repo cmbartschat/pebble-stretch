@@ -4,9 +4,7 @@ use core::{
 };
 
 use alloc::{boxed::Box, rc::Rc};
-use pebble_rust_2026::{
-    APP, DictionaryView, GColor, InboxSize, hex_color, log_c_str, message_keys,
-};
+use pebble_rust_2026::{APP, DictionaryView, GColor, InboxSize, hex_color, message_keys};
 
 message_keys!(keys);
 
@@ -23,9 +21,9 @@ fn color_from_rgb(r: u8, g: u8, b: u8) -> GColor {
 
 fn color_from_hex(v: u32) -> GColor {
     color_from_rgb(
-        (v.shr(22) & 0xffu32) as u8,
-        (v.shr(14) & 0xffu32) as u8,
-        (v.shr(6) & 0xffu32) as u8,
+        (v.shr(22) & 0x3u32) as u8,
+        (v.shr(14) & 0x3u32) as u8,
+        (v.shr(6) & 0x3u32) as u8,
     )
 }
 
@@ -65,7 +63,6 @@ pub fn load_config(mut callback: Box<dyn FnMut(&Config)>) -> Rc<RefCell<Config>>
     APP.set_message_handler({
         let config = config.clone();
         move |message| {
-            log_c_str(c"got message");
             let mut config = config.borrow_mut();
             if let Some(v) = get_message_color(message, keys::CONFIG_BACKGROUND_COLOR) {
                 config.background_color = v;
