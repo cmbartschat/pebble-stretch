@@ -1,6 +1,11 @@
 #![no_main]
 #![no_std]
 
+use pebble_rust_2026::{MallocAllocator, Platform};
+
+#[global_allocator]
+static ALLOCATOR: MallocAllocator = MallocAllocator;
+
 mod animation;
 mod config;
 mod demo_trigger;
@@ -56,7 +61,11 @@ fn main() -> i32 {
         let progress = progress.clone();
         Box::new(move |layer, mut ctx| {
             let mut progress = progress.borrow_mut();
-            let layout = derive_layout(layer.get_unobstructed_bounds());
+            let mut bounds = layer.get_unobstructed_bounds();
+            if Platform::current().is_round() {
+                bounds = bounds.shrink(bounds.size.w as i32 / 7);
+            }
+            let layout = derive_layout(bounds);
             let config = config.borrow();
             progress.stage_complete =
                 render_animated_time(&mut ctx, &layout, &progress, &config) == Status::Complete;

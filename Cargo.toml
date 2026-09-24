@@ -10,7 +10,7 @@ doctest = false
 bench = false
 
 [dependencies]
-pebble_rust_2026 = { git = "https://github.com/cmbartschat/pebble-rust-2026.git", rev = "97b143e3a27932933a75cc661b031f8696f63ddc" }
+pebble_rust_2026 = { git = "https://github.com/cmbartschat/pebble-rust-2026.git", rev = "fc73bf542bb7f8712b3e032797c2ef8035810f62" }
 
 [profile.release]
 panic = "abort"

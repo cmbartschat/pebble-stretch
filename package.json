@@ -1,7 +1,7 @@
 {
     "author": "Christoph Bartschat",
     "dependencies": {
-        "pebble-clay": "^1.0.0"
+        "@rebble/clay": "^1.1.0"
     },
     "description": "Minimalist watchface with animated digits",
     "keywords": [
@@ -33,12 +33,17 @@
         },
         "sdkVersion": "3",
         "targetPlatforms": [
-            "emery"
+            "basalt",
+            "chalk",
+            "diorite",
+            "emery",
+            "flint",
+            "gabbro"
         ],
         "uuid": "d6d54026-9344-4717-afb1-d006c72f2471",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "1.0.1"
+    "version": "1.1.0"
 }
